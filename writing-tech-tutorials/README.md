@@ -34,8 +34,8 @@
 ## 安装
 
 ```bash
-git clone <this-repo> writing-tech-tutorials
-cd writing-tech-tutorials
+git clone git@github.com:AGI-Core/AGI-engine.git
+cd AGI-engine/writing-tech-tutorials
 ./install.sh
 ```
 
