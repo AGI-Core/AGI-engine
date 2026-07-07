@@ -1,12 +1,13 @@
-# 每章自查 grep 命令
+# 教程自查 grep 命令
 
-> 每写完一章，把这份文档里的命令跑一遍。达标才 commit。
+> 默认单文件模式：写完 `docs/learn/<topic>/<topic>.md` 后，把这份文档里的命令跑一遍。达标才 commit。
 > 阈值参见 [_spec.md](../_spec.md) 第 7 节。
 
 ## 阈值总表
 
-| 章节 | 行数 | 📦 | 💡 | file:/// | mermaid |
+| 文件 | 行数 | 📦 | 💡 | file:/// | mermaid |
 | --- | --- | --- | --- | --- | --- |
+| `<topic>.md` | 350-900 | ≥ 4 | 1 | ≥ 8 | ≥ 1 |
 | README.md | 60-90 | 0 | 0 | 0 | 0 |
 | 00-intro.md | 150-220 | ≥ 3 | 1 | ≥ 1 | ≥ 1 |
 | 01-overview.md | 200-300 | ≥ 3 | 1 | ≥ 5 | ≥ 2 |
@@ -18,9 +19,9 @@
 
 ---
 
-## 通用命令（每章都跑）
+## 默认单文件命令
 
-设 `<file>` 为章节文件路径，比如 `docs/learn/rag/00-intro.md`：
+设 `<file>` 为正文路径，比如 `docs/learn/rag/rag.md`：
 
 ```bash
 FILE=<file>
@@ -37,13 +38,18 @@ grep -c "💡 \*\*一句话记住\*\*" $FILE
 # 4. file:/// 源码链接数量
 grep -c "file:///" $FILE
 
-# 5. 二级标题数量（通常应该 = 5，5 段式）
+# 5. mermaid 图数量
+grep -c "^\`\`\`mermaid" $FILE
+
+# 6. 二级标题数量（应该覆盖阅读路线、类比、全景图、主流程、职责、设计决策、坑点、Q&A、源码索引）
 grep -c "^## " $FILE
 ```
 
 ---
 
-## 章节专项命令
+## 多文件模式专项命令
+
+只有用户明确要求拆成多文件文档集时，才使用下面这些命令。
 
 ### README.md 专项
 
@@ -109,12 +115,12 @@ grep -c "file:///" $FILE
 
 ---
 
-## 敏感词扫描（每章必跑）
+## 敏感词扫描（正文必跑）
 
 ```bash
-FILE=docs/learn/<topic>/<chapter>.md
+FILE=docs/learn/<topic>/<topic>.md
 
-# 检查是否泄露公司内部信息、内部平台名（本 skill 严格禁止敏感信息，产出章节里也应避免）
+# 检查是否泄露公司内部信息、内部平台名（本 skill 严格禁止敏感信息，产出正文里也应避免）
 grep -rEi "<你自己项目的敏感词表>" $FILE || echo "PASS"
 ```
 
@@ -124,17 +130,17 @@ grep -rEi "<你自己项目的敏感词表>" $FILE || echo "PASS"
 
 ### 📦 数量不够怎么办
 
-- 找章节里最"术语密集"的那段，抽出一个术语放 📦 里详解
-- 如果全章都很扁平，看看是不是漏了某个背景概念（读的时候小白肯定问的那个）
+- 找正文里最"术语密集"的那段，抽出一个术语放 📦 里详解
+- 如果全文都很扁平，看看是不是漏了某个背景概念（读的时候小白肯定问的那个）
 
 ### 💡 一句话记住数量 ≠ 1 怎么办
 
-- 0 个：章末补一行 `> 💡 **一句话记住**：...`
-- \> 1 个：找出多余的合并成 1 句，放章末
+- 0 个：文末补一行 `> 💡 **一句话记住**：...`
+- \> 1 个：找出多余的合并成 1 句，放文末
 
 ### file:/// 数量不够怎么办
 
-- 找章节里"提到某个文件但没链接"的地方
+- 找正文里"提到某个文件但没链接"的地方
 - 每个 step 至少一个链接
 - 每个组件表格里的组件都要有链接
 
@@ -144,9 +150,9 @@ grep -rEi "<你自己项目的敏感词表>" $FILE || echo "PASS"
 - 检查是不是每步都有代码引用
 - 是不是缺了 📦 补充背景
 - 快速判断行数是否够：`wc -l $FILE` 对比阈值表
-- **不要通过灌水凑行数**——如果内容确实少，说明章节切分需要合并
+- **不要通过灌水凑行数**——如果内容确实少，说明范围可以收窄
 
-### mermaid 图数量不够怎么办（01-overview 专项）
+### mermaid 图数量不够怎么办
 
 - 至少 1 张架构图（组件关系）
 - 至少 1 张数据流图（请求怎么走）
@@ -154,25 +160,21 @@ grep -rEi "<你自己项目的敏感词表>" $FILE || echo "PASS"
 
 ---
 
-## 一键跑全章自查（示例脚本）
+## 一键跑正文自查（示例脚本）
 
 ```bash
 #!/bin/bash
 # self_review.sh <topic>
 TOPIC=$1
 BASE="docs/learn/$TOPIC"
+FILE="$BASE/$TOPIC.md"
 
-for f in "$BASE"/README.md "$BASE"/00-intro.md "$BASE"/01-overview.md "$BASE"/appendix-a-interview-qa.md "$BASE"/appendix-b-code-index.md; do
-    if [ -f "$f" ]; then
-        echo "=== $f ==="
-        wc -l "$f"
-        echo "📦: $(grep -c "📦" "$f")"
-        echo "💡: $(grep -c "💡 \*\*一句话记住\*\*" "$f")"
-        echo "file:///: $(grep -c "file:///" "$f")"
-        echo "mermaid: $(grep -c "^\`\`\`mermaid" "$f")"
-        echo ""
-    fi
-done
+echo "=== $FILE ==="
+wc -l "$FILE"
+echo "📦: $(grep -c "📦" "$FILE")"
+echo "💡: $(grep -c "💡 \*\*一句话记住\*\*" "$FILE")"
+echo "file:///: $(grep -c "file:///" "$FILE")"
+echo "mermaid: $(grep -c "^\`\`\`mermaid" "$FILE")"
 ```
 
 保存后 `bash self_review.sh <topic>` 一键跑。

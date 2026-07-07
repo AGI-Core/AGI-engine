@@ -7,12 +7,12 @@
 - **强制 5 段式教学节奏**：类比 → 一步步走 → 贴源码 → 📦 额外知识 → 💡 一句话记住
 - **三档阅读路径**：小白线 / 后端线 / 速查线，一份文档服务多类读者
 - **内联 spec → plan → 逐 Task 实施**：不依赖外部 skill，独立可用
-- **每章 grep 自查 + 跨章交叉审查**：产出质量有底线
-- **强产出结构**：README + 内核章 + 面试 Q&A 附录 + 代码索引附录
+- **正文 grep 自查 + 整体验收**：产出质量有底线
+- **强产出结构**：`_spec.md` + `_plan.md` + 单文件整合教程
 
 ## 效果预览
 
-一份"HTTP 服务器"模块讲解的 `00-intro.md` 节选：
+一份"HTTP 服务器"模块讲解的整合教程节选：
 
 > **0.1 一个真实场景**
 > 新来的同事问"我们的 HTTP 服务器是怎么处理请求的"，同事们说不清楚——因为它跨越了 Router / Middleware / Handler 三层...
@@ -62,22 +62,16 @@ SKILL_INSTALL_ROOT=~/my-skills ./install.sh
 
 ## 产出示例
 
-skill 会在**用户当前项目**下生成：
+skill 默认会在**用户当前项目**下生成：
 
 ```
 docs/learn/<你的模块>/
 ├── _spec.md                          # 需求 spec
 ├── _plan.md                          # 实施 plan
-├── README.md                         # 导航 + 三档阅读路径
-├── 00-intro.md                       # 5 分钟建立直觉
-├── 01-overview.md                    # 全景图 + 组件分工
-├── 02-<核心>.md                      # 内核章（弹性）
-├── 03-<核心>.md
-├── 04-design-decisions.md            # 设计决策深潜
-├── 05-pitfalls-and-extensions.md     # 坑 + 扩展
-├── appendix-a-interview-qa.md        # 面试 Q&A（≥15 题）
-└── appendix-b-code-index.md          # 代码索引
+└── <你的模块>.md                     # 单文件整合教程
 ```
+
+只有当你明确要求"拆成多文件文档集"时，Agent 才会额外生成 README / intro / overview / appendix 等多份 markdown。
 
 ## 版本
 

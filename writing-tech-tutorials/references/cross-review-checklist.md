@@ -1,13 +1,13 @@
-# 跨章交叉审查清单
+# 整体验收清单
 
-> 全部章节写完后跑这份清单。目标：确保多份文档"看起来像一份"，术语统一、链接有效、章节间概念呼应。
+> 默认单文件教程写完后跑这份清单。目标：确保正文结构完整、术语统一、源码链接有效、Q&A 不引入未解释概念。
 > 建议用 checkbox 逐条走，全部打勾才算 skill 完成。
 
 ---
 
 ## 1. 术语一致性
 
-同一个概念在不同章有不同叫法是最常见的破坏"整体感"的坑。
+同一个概念在全文里有不同叫法，是最常见的阅读障碍。
 
 - [ ] **命名风格统一**：`small-to-big` / `Small-to-Big` / `small_to_big` 三种写法只留一种
 - [ ] **中英文选择一致**：某个概念是用"重排"还是"rerank"要全文一致
@@ -17,10 +17,10 @@
 
 ```bash
 # 找同一概念的多种写法
-grep -rn "small-to-big\|small_to_big\|Small-to-Big\|SmallToBig" docs/learn/<topic>/
+grep -rn "small-to-big\|small_to_big\|Small-to-Big\|SmallToBig" docs/learn/<topic>/<topic>.md
 
 # 找中英文混用
-grep -rn "重排\|rerank\|Rerank\|重排序" docs/learn/<topic>/
+grep -rn "重排\|rerank\|Rerank\|重排序" docs/learn/<topic>/<topic>.md
 ```
 
 出现多种写法就统一到一种再自查。
@@ -37,59 +37,59 @@ grep -rn "重排\|rerank\|Rerank\|重排序" docs/learn/<topic>/
 
 ```bash
 # 提取所有 file:/// 引用
-grep -oE "file:///[^)]+" docs/learn/<topic>/*.md | sort -u
+grep -oE "file:///[^)]+" docs/learn/<topic>/<topic>.md | sort -u
 
 # 抽 5-10 处 spot-check：Read 打开确认行号
 ```
 
 ---
 
-## 3. README 相对链接完整性
+## 3. 正文结构完整性
 
-- [ ] **章节索引里的每个 `./XX-YYY.md` 都真的存在**
-- [ ] **术语速查表里"详见 X 章"的每个引用都真的在那一章讲过**
+- [ ] **阅读路线存在**：小白 / 后端 / 老手三档读法清楚
+- [ ] **主流程存在**：从入口到结果有一步步走
+- [ ] **设计决策存在**：解释为什么这么设计
+- [ ] **Q&A 存在**：至少覆盖开场、原理、追问三类问题
+- [ ] **源码索引存在**：关键文件都有入口
 
 ### grep 检查命令
 
 ```bash
-# 章节相对链接
-grep -oE "\./[a-zA-Z0-9_-]+\.md" docs/learn/<topic>/README.md | sort -u | while read f; do
-    [ -f "docs/learn/<topic>/${f#./}" ] || echo "MISSING: $f"
-done
+FILE=docs/learn/<topic>/<topic>.md
+grep -cE "阅读路线|类比|全景图|主流程|设计决策|Q&A|源码索引" "$FILE"
 ```
 
 ---
 
-## 4. 章节间概念呼应
+## 4. 段落间概念呼应
 
-- [ ] **前一章解释过的名词，后一章直接用**（不要重新解释）
-- [ ] **前一章埋的伏笔，后一章要接**（比如 01 章说"决策 4 会展开讲"，04 章确实要展开）
+- [ ] **前面解释过的名词，后面可以直接用**（不要反复从零解释）
+- [ ] **前面埋的伏笔，后面要接**（比如全景图里出现的模块，后面职责表要讲）
 - [ ] **📦 里补的背景，主线里不再重复解释**
 
 ### 手动检查
 
-- 抽 3 章，读一遍，感觉"这章有没有假设读过前面的章节"
-- 如果某章可以跳读也不影响，说明呼应弱（这不算问题，取决于你的定位）
+- 抽 3 个二级标题连续读一遍，确认过渡自然
+- 如果每段都像孤立 FAQ，说明主线弱，需要补过渡句
 
 ---
 
-## 5. 术语速查表覆盖
+## 5. 术语解释覆盖
 
-- [ ] README 的术语速查表里**每个术语**都在某一章的 📦 里详解过
-- [ ] 反过来：主要 📦 里的术语，都在术语速查表里列了
+- [ ] 主要术语第一次出现时已经解释
+- [ ] 主要 📦 里的术语，在后文主线里能用上
 
 ### 手动检查
 
-- 打开 README 的术语表
-- 逐条搜正文（`grep -rn "术语"` ）
-- 找到讲得最详细的那一章，写在"详见 X 章"栏
+- 逐条搜正文（`grep -rn "术语"`）
+- 找到第一次出现的位置，确认附近有解释
 
 ---
 
-## 6. Q&A 附录引用是否指向正文
+## 6. Q&A 是否指向正文
 
-- [ ] appendix-a 每题的**代码引用**都能落到正文讲过的地方
-- [ ] appendix-a 每题**没有引入新概念**（有的话应该在正文加一段）
+- [ ] Q&A 每题的**代码引用**都能落到前文讲过的地方
+- [ ] Q&A 每题**没有引入新概念**（有的话应该在正文前面加一段）
 
 ### 手动检查
 
@@ -120,8 +120,7 @@ done
 ### grep 检查命令
 
 ```bash
-grep -rEi "<你自己项目的敏感词表>" \
-    --include="*.md" docs/learn/<topic>/ || echo "PASS"
+grep -rEi "<你自己项目的敏感词表>" docs/learn/<topic>/<topic>.md || echo "PASS"
 ```
 
 ---
@@ -135,10 +134,8 @@ TOPIC=$1
 BASE="docs/learn/$TOPIC"
 
 echo "=== 1. 章节相对链接完整性 ==="
-grep -oE "\./[a-zA-Z0-9_-]+\.md" "$BASE/README.md" | sort -u | while read f; do
-    [ -f "$BASE/${f#./}" ] || echo "MISSING: $f"
-done
-echo "PASS 若无输出"
+FILE="$BASE/$TOPIC.md"
+grep -cE "阅读路线|类比|全景图|主流程|设计决策|Q&A|源码索引" "$FILE"
 
 echo ""
 echo "=== 2. 术语一致性（自定义命令，需你补充关键词） ==="
@@ -146,7 +143,7 @@ echo "=== 2. 术语一致性（自定义命令，需你补充关键词） ==="
 
 echo ""
 echo "=== 3. 源码链接总数 ==="
-grep -rc "file:///" "$BASE/" | grep -v ":0"
+grep -c "file:///" "$FILE"
 
 echo ""
 echo "=== 4. 敏感词 ==="
@@ -157,4 +154,4 @@ echo "=== 4. 敏感词 ==="
 
 ## 交叉审查通过 → skill 完成
 
-全部 checkbox 打勾 → 跑一次 `git log --oneline` 确认所有章节都 commit 了 → emit 完成钩子（Phase 5）→ skill 结束。
+全部 checkbox 打勾 → 跑一次 `git log --oneline` 确认正文和验收都 commit 了 → emit 完成钩子（Phase 5）→ skill 结束。
